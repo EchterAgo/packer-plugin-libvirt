@@ -113,6 +113,9 @@ type Volume struct {
 	Format string `mapstructure:"format" required:"false"`
 	// Specifies the device type. If omitted, defaults to "disk". Can be `disk`, `floppy`, `cdrom` or `lun`.
 	Device string `mapstructure:"device" required:"false"`
+	// Specifies the volume cache type, like `none`, `writethrough`, `writeback`, `directsync`, `unsafe`. If omitted, the
+	// hypervisors default cache will be used.
+	Cache string `mapstructure:"cache" required:"false"`
 
 	allowUnspecifiedSize bool `undocumented:"true"`
 }
@@ -265,6 +268,9 @@ func (v *Volume) DomainDiskXml() *libvirtxml.DomainDisk {
 	if v.Format != "" {
 		domainDisk.Driver = &libvirtxml.DomainDiskDriver{}
 		domainDisk.Driver.Type = v.Format
+		if v.Cache != "" {
+			domainDisk.Driver.Cache = v.Cache
+		}
 	}
 
 	if v.ReadOnly {
